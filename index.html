@@ -27,21 +27,33 @@
   <script>
     var map = L.map('js-map', {
       crs: L.CRS.Simple,
-      minZoom: 0,
+      minZoom: 2,
       maxZoom: 6
-    }).setView([0, 0], 0);
+    });
 
-    // var bounds = [[0,0], [1000,1199.89]];
-    var southWest = map.unproject([0, 13056], map.getMaxZoom());
-    var northEast = map.unproject([14080, 0], map.getMaxZoom());
+    var southWest = map.unproject([0, 16384], map.getMaxZoom());
+    var northEast = map.unproject([16384, 0], map.getMaxZoom());
     map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
 
     L.tileLayer('/images/{z}_{x}_{y}.png', {
-      attribution: 'Map data &copy; ???',
+      attribution: 'Map data &copy; Nintendo',
     }).addTo(map);
-    // var image = L.imageOverlay('uqm_map_full.jpg', bounds).addTo(map);
 
-    // map.fitBounds(bounds);
+    // Example Markers
+
+    // Units in Pixels
+
+    L.marker(L.latLng([ 0, 0 ])).addTo(map);
+    L.marker(L.latLng([ -100, 100 ])).addTo(map);
+    L.marker(L.latLng([ -256, 256 ])).addTo(map);
+
+    // Units in Map Units (1 pixel = 64 Map units)
+
+    var marker = L.marker(map.unproject([16384, 0], map.getMaxZoom())).addTo(map);
+    var marker = L.marker(map.unproject([0, 0], map.getMaxZoom())).addTo(map);
+    var marker = L.marker(map.unproject([0, 16384], map.getMaxZoom())).addTo(map);
+
+    map.setView([-128, 128], 2);
 
   </script>
 </body>
