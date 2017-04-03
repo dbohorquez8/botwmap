@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hyrule Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+   <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="js-map" class="map-container"></div>
+
+  <style>
+    .map-container {
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    .leaflet-container {
+      background: #000;
+    }
+  </style>
+
+  <script>
+    var map = L.map('js-map', {
+      crs: L.CRS.Simple,
+      minZoom: 0,
+      maxZoom: 6
+    }).setView([0, 0], 0);
+
+    // var bounds = [[0,0], [1000,1199.89]];
+    var southWest = map.unproject([0, 13056], map.getMaxZoom());
+    var northEast = map.unproject([14080, 0], map.getMaxZoom());
+    map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+    L.tileLayer('/images/{z}_{x}_{y}.png', {
+      attribution: 'Map data &copy; ???',
+    }).addTo(map);
+    // var image = L.imageOverlay('uqm_map_full.jpg', bounds).addTo(map);
+
+    // map.fitBounds(bounds);
+
+  </script>
+</body>
+</html>
