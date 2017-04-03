@@ -44,14 +44,17 @@
     // Units in Pixels
 
     L.marker(L.latLng([ 0, 0 ])).addTo(map);
-    L.marker(L.latLng([ -100, 100 ])).addTo(map);
+    L.marker(L.latLng([ -128, 128 ])).addTo(map);
     L.marker(L.latLng([ -256, 256 ])).addTo(map);
 
     // Units in Map Units (1 pixel = 64 Map units)
 
-    var marker = L.marker(map.unproject([16384, 0], map.getMaxZoom())).addTo(map);
-    var marker = L.marker(map.unproject([0, 0], map.getMaxZoom())).addTo(map);
-    var marker = L.marker(map.unproject([0, 16384], map.getMaxZoom())).addTo(map);
+    L.marker(map.unproject([0, 0], map.getMaxZoom())).addTo(map);
+    L.marker(map.unproject([8192, 8192], map.getMaxZoom())).addTo(map);
+    L.marker(map.unproject([2304, 3328], map.getMaxZoom())).addTo(map);
+    L.marker(map.unproject([14080, 3328], map.getMaxZoom())).addTo(map);
+    L.marker(map.unproject([14080, 13056], map.getMaxZoom())).addTo(map);
+    L.marker(map.unproject([2304, 13056], map.getMaxZoom())).addTo(map);
 
     map.setView([-128, 128], 2);
 
