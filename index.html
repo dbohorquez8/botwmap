@@ -39,22 +39,55 @@
       attribution: 'Map data &copy; Nintendo',
     }).addTo(map);
 
+    //Marker Icons
+
+    var iconSeed = L.icon({
+      iconUrl: '/icons/korok-seed.png',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    var iconShrineActive = L.icon({
+      iconUrl: '/icons/shrine-active.svg',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    var iconShrineInactive = L.icon({
+      iconUrl: '/icons/shrine-inactive.svg',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    var tooltipOptions = {
+      direction: 'top', 
+      offset: [0, -8]
+    };
+
+    /* Map boundaries in map units (-y, x)
+    NW: -52, 36
+    NE: -52, 220
+    SW: -204, 36
+    SE: -204, 220
+    Center: -128, 128
+    */
+
     // Example Markers
+    L.marker(L.latLng([ -100.5, 100.5 ]), {icon: iconSeed}).bindTooltip("Rock Circle", tooltipOptions).addTo(map);
+    L.marker(L.latLng([ -84, 84 ]), {icon: iconShrineActive}).bindTooltip("Oman Au Shrine", tooltipOptions).addTo(map);
+    L.marker(L.latLng([ -128, 128 ]), {icon: iconShrineInactive}).bindTooltip("Oman Au Shrine", tooltipOptions).addTo(map);
 
-    // Units in Pixels
+    /* Map boundaries in pixels (x, y)
+    (1 Map unit = 64 pixels)
+    NW: 2304, 3328
+    NE: 14080, 3328
+    SW: 2304, 13056
+    SE: 14080, 13056
+    Center: 8192, 8192
+    */
 
-    L.marker(L.latLng([ 0, 0 ])).addTo(map);
-    L.marker(L.latLng([ -128, 128 ])).addTo(map);
-    L.marker(L.latLng([ -256, 256 ])).addTo(map);
-
-    // Units in Map Units (1 pixel = 64 Map units)
-
-    L.marker(map.unproject([0, 0], map.getMaxZoom())).addTo(map);
-    L.marker(map.unproject([8192, 8192], map.getMaxZoom())).addTo(map);
-    L.marker(map.unproject([2304, 3328], map.getMaxZoom())).addTo(map);
-    L.marker(map.unproject([14080, 3328], map.getMaxZoom())).addTo(map);
-    L.marker(map.unproject([14080, 13056], map.getMaxZoom())).addTo(map);
-    L.marker(map.unproject([2304, 13056], map.getMaxZoom())).addTo(map);
+    // Example Marker in pixels
+    // L.marker(map.unproject([8192, 8192], map.getMaxZoom()), {icon: iconSeed}).bindTooltip("Rock Circle", tooltipOptions).addTo(map);
 
     map.setView([-128, 128], 2);
 
