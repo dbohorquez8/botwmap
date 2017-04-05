@@ -35,26 +35,26 @@
     var northEast = map.unproject([16384, 0], map.getMaxZoom());
     map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
 
-    L.tileLayer('/images/{z}_{x}_{y}.png', {
+    L.tileLayer('src/images/map-tiles/{z}_{x}_{y}.png', {
       attribution: 'Map data &copy; Nintendo',
     }).addTo(map);
 
     //Marker Icons
 
     var iconSeed = L.icon({
-      iconUrl: '/icons/korok-seed.png',
+      iconUrl: 'src/images/icons/korok-seed.png',
       iconSize: [24, 24],
       iconAnchor: [12, 12]
     });
 
     var iconShrineActive = L.icon({
-      iconUrl: '/icons/shrine-active.svg',
+      iconUrl: 'src/images/icons/shrine-active.svg',
       iconSize: [24, 24],
       iconAnchor: [12, 12]
     });
 
     var iconShrineInactive = L.icon({
-      iconUrl: '/icons/shrine-inactive.svg',
+      iconUrl: 'src/images/icons/shrine-inactive.svg',
       iconSize: [24, 24],
       iconAnchor: [12, 12]
     });
@@ -91,6 +91,11 @@
 
     map.setView([-128, 128], 2);
 
+    map.on('click', addMarker);
+
+    function addMarker(e){
+      var newMarker = new L.marker(e.latlng, {icon: iconShrineInactive}).bindTooltip("Oman Au Shrine", tooltipOptions).addTo(map);
+    }
   </script>
 </body>
 </html>
