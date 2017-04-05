@@ -30,12 +30,22 @@ class App extends Component {
     });
 
     return (
-      <Map className="map-container" minZoom={2} maxZoom={6} center={center} zoom={2}>
+      <Map 
+        className="map-container" 
+        minZoom={2} 
+        maxZoom={6} 
+        center={center} 
+        zoom={2}
+        bounds={new L.LatLngBounds([0,-256], [-256, 0])}
+      >
         <TileLayer
-          url='/images/map-tiles/{z}_{x}_{y}.png'
+          url='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/{z}_{x}_{y}.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
           attribution='Map data &copy; Nintendo'
         />
-        <Marker position={[ -84, 84 ]} icon={iconShrineActive}>
+        <Marker 
+          position={[ -84, 84 ]} 
+          icon={iconShrineActive}
+        >
           <Tooltip direction='top' offset={[0, -8]}>
             <span>Oman Au Shrine</span>
           </Tooltip>
