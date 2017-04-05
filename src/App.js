@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import korokSeed from './images/icons/korok-seed.png';
 import shrineActive from './images/icons/shrine-active.svg';
 import shrineInactive from './images/icons/shrine-inactive.svg';
-import './App.css';
 import 'leaflet/dist/leaflet.css';
+import './App.css';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
 
@@ -32,11 +32,12 @@ class App extends Component {
     return (
       <Map 
         className="map-container" 
-        minZoom={2} 
+        crs={L.CRS.Simple}
+        minZoom={0} 
         maxZoom={6} 
         center={center} 
-        zoom={2}
-        bounds={new L.LatLngBounds([0,-256], [-256, 0])}
+        zoom={0}
+        bounds={new L.LatLngBounds([0,256], [-256, 0])}
       >
         <TileLayer
           url='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/{z}_{x}_{y}.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
