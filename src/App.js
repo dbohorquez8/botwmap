@@ -15,7 +15,7 @@ export default class App extends Component {
     this.state = {
       center: [-128, 128],
       zoom: 2,
-      shrines: [],
+      markers: [],
       addingMarker: false,
       positionClicked: [],
       markerInputValue: ''
@@ -54,19 +54,19 @@ export default class App extends Component {
   }
 
   addMarker(type, position, name) {
-    var newShrine = {
+    var newMarker = {
       type: type,
       name: name,
       position: position
     };
 
-    var updatedShrines = [
-      ...this.state.shrines,
-      newShrine
+    var updatedMarkers = [
+      ...this.state.markers,
+      newMarker
     ];
 
     this.setState({
-      shrines: updatedShrines,
+      markers: updatedMarkers,
       markerInputValue: ''
     });
 
@@ -94,12 +94,12 @@ export default class App extends Component {
 
     return (
       <div>
-        <Map 
-          className="map-container" 
+        <Map
+          className="map-container"
           crs={L.CRS.Simple}
-          minZoom={2} 
-          maxZoom={6} 
-          center={this.state.center} 
+          minZoom={2}
+          maxZoom={6}
+          center={this.state.center}
           zoom={this.state.zoom}
           bounds={new L.LatLngBounds([0,256], [-256, 0])}
           onClick={this.openAddMarkerModal}
@@ -110,20 +110,20 @@ export default class App extends Component {
             errorTileUrl='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/blank.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
             attribution='Map data &copy; Nintendo'
           />
-          {this.state.shrines.map((shrine, index) =>
-            <Marker 
-              position={shrine.position} 
-              icon={ shrine.type === 'korokSeed' ? iconSeed : iconShrineActive }
+          {this.state.markers.map((marker, index) =>
+            <Marker
+              position={marker.position}
+              icon={ marker.type === 'korokSeed' ? iconSeed : iconShrineActive }
               key={index}
             >
               <Tooltip direction='top' offset={[0, -8]}>
-                <span>{shrine.name}</span>
+                <span>{marker.name}</span>
               </Tooltip>
             </Marker>
           )}
         </Map>
-        <AddMarkerForm 
-          isOpen={this.state.addingMarker} 
+        <AddMarkerForm
+          isOpen={this.state.addingMarker}
           addMarker={this.addMarker}
           closeAddMarkerModal={this.closeAddMarkerModal}
           positionClicked={this.state.positionClicked}

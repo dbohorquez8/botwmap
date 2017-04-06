@@ -25,7 +25,7 @@ export default class AddMarkerForm extends Component {
   handleSubmit() {
     this.props.addMarker(
       this.state.markerType,
-      this.props.positionClicked, 
+      this.props.positionClicked,
       this.props.markerInputValue
     );
   };
@@ -57,8 +57,8 @@ export default class AddMarkerForm extends Component {
           open={this.props.isOpen}
           onRequestClose={this.handleClose}
         >
-          <RadioButtonGroup 
-            name="markerType" 
+          <RadioButtonGroup
+            name="markerType"
             defaultSelected={this.state.markerType}
             onChange={ (e) => this.setState({ markerType: e.target.value }) }
           >
