@@ -6,22 +6,57 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
+import AddMarkerForm from './AddMarkerForm';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      shrines: []
+      center: [-128, 128],
+      zoom: 2,
+      shrines: [],
+      addingMarker: false,
+      positionClicked: [],
+      shrineInputValue: ''
     }
 
     this.addMarker = this.addMarker.bind(this);
+    this.openAddMarkerModal = this.openAddMarkerModal.bind(this);
+    this.closeAddMarkerModal = this.closeAddMarkerModal.bind(this);
+    this.handleShrineNameInput = this.handleShrineNameInput.bind(this);
   }
 
-  addMarker(event) {
+  openAddMarkerModal(event) {
+    if(this.state.zoom === 6) {
+      this.setState({
+        addingMarker: true,
+        positionClicked: event.latlng,
+      });
+    } else {
+      this.setState({
+        center: event.latlng,
+        zoom: 6
+      });
+    }
+  }
+
+  closeAddMarkerModal() {
+    this.setState({
+      addingMarker: false
+    });
+  }
+
+  handleShrineNameInput(event) {
+    this.setState({
+      shrineInputValue: event.target.value
+    });
+  }
+
+  addMarker(position, name) {
     var newShrine = {
-      name: 'Oman Au',
-      position: event.latlng
+      name: name,
+      position: position
     };
 
     var updatedShrines = [
@@ -29,56 +64,72 @@ export default class App extends Component {
       newShrine
     ];
 
-    this.setState({shrines: updatedShrines});
+    this.setState({
+      shrines: updatedShrines,
+      shrineInputValue: ''
+    });
+
+    this.closeAddMarkerModal();
   }
 
   render() {
-    const center = [-128, 128];
-
     const iconSeed = L.icon({
       iconUrl: korokSeed,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
     });
 
     const iconShrineActive = L.icon({
       iconUrl: shrineActive,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
     });
 
     const iconShrineInactive = L.icon({
       iconUrl: shrineInactive,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
     });
 
     return (
-      <Map 
-        className="map-container" 
-        crs={L.CRS.Simple}
-        minZoom={2} 
-        maxZoom={6} 
-        center={center} 
-        zoom={0}
-        bounds={new L.LatLngBounds([0,256], [-256, 0])}
-        onClick={this.addMarker}
-      >
-        <TileLayer
-          url='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/{z}_{x}_{y}.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
-          attribution='Map data &copy; Nintendo'
+      <div>
+        <Map 
+          className="map-container" 
+          crs={L.CRS.Simple}
+          minZoom={2} 
+          maxZoom={6} 
+          center={this.state.center} 
+          zoom={this.state.zoom}
+          bounds={new L.LatLngBounds([0,256], [-256, 0])}
+          onClick={this.openAddMarkerModal}
+          onZoom={ (e) => {this.setState({zoom: e.target._zoom })} }
+        >
+          <TileLayer
+            url='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/{z}_{x}_{y}.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
+            errorTileUrl='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/blank.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
+            attribution='Map data &copy; Nintendo'
+          />
+          {this.state.shrines.map((shrine, index) =>
+            <Marker 
+              position={shrine.position} 
+              icon={iconShrineActive}
+              key={index}
+            >
+              <Tooltip direction='top' offset={[0, -8]}>
+                <span>{shrine.name}</span>
+              </Tooltip>
+            </Marker>
+          )}
+        </Map>
+        <AddMarkerForm 
+          isOpen={this.state.addingMarker} 
+          addMarker={this.addMarker}
+          closeAddMarkerModal={this.closeAddMarkerModal}
+          positionClicked={this.state.positionClicked}
+          shrineInputValue={this.state.shrineInputValue}
+          handleShrineNameInput={this.handleShrineNameInput}
         />
-        {this.state.shrines.map((shrine, index) =>
-          <Marker 
-            position={shrine.position} 
-            icon={iconShrineActive}
-          >
-            <Tooltip direction='top' offset={[0, -8]}>
-              <span>{shrine.name}</span>
-            </Tooltip>
-          </Marker>
-        )}
-      </Map>
+      </div>
     );
   }
 }
