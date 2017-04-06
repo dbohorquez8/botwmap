@@ -18,13 +18,13 @@ export default class App extends Component {
       shrines: [],
       addingMarker: false,
       positionClicked: [],
-      shrineInputValue: ''
+      markerInputValue: ''
     }
 
     this.addMarker = this.addMarker.bind(this);
     this.openAddMarkerModal = this.openAddMarkerModal.bind(this);
     this.closeAddMarkerModal = this.closeAddMarkerModal.bind(this);
-    this.handleShrineNameInput = this.handleShrineNameInput.bind(this);
+    this.handleMarkerNameInput = this.handleMarkerNameInput.bind(this);
   }
 
   openAddMarkerModal(event) {
@@ -47,14 +47,15 @@ export default class App extends Component {
     });
   }
 
-  handleShrineNameInput(event) {
+  handleMarkerNameInput(event) {
     this.setState({
-      shrineInputValue: event.target.value
+      markerInputValue: event.target.value
     });
   }
 
-  addMarker(position, name) {
+  addMarker(type, position, name) {
     var newShrine = {
+      type: type,
       name: name,
       position: position
     };
@@ -66,7 +67,7 @@ export default class App extends Component {
 
     this.setState({
       shrines: updatedShrines,
-      shrineInputValue: ''
+      markerInputValue: ''
     });
 
     this.closeAddMarkerModal();
@@ -75,8 +76,8 @@ export default class App extends Component {
   render() {
     const iconSeed = L.icon({
       iconUrl: korokSeed,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
+      iconSize: [12, 12],
+      iconAnchor: [6, 6]
     });
 
     const iconShrineActive = L.icon({
@@ -112,7 +113,7 @@ export default class App extends Component {
           {this.state.shrines.map((shrine, index) =>
             <Marker 
               position={shrine.position} 
-              icon={iconShrineActive}
+              icon={ shrine.type === 'korokSeed' ? iconSeed : iconShrineActive }
               key={index}
             >
               <Tooltip direction='top' offset={[0, -8]}>
@@ -126,8 +127,8 @@ export default class App extends Component {
           addMarker={this.addMarker}
           closeAddMarkerModal={this.closeAddMarkerModal}
           positionClicked={this.state.positionClicked}
-          shrineInputValue={this.state.shrineInputValue}
-          handleShrineNameInput={this.handleShrineNameInput}
+          markerInputValue={this.state.markerInputValue}
+          handleMarkerNameInput={this.handleMarkerNameInput}
         />
       </div>
     );

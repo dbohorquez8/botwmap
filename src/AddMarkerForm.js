@@ -3,13 +3,15 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 
 export default class AddMarkerForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      open: props.isOpen
+      open: props.isOpen,
+      markerType: 'korokSeed'
     }
 
     this.handleClose = this.handleClose.bind(this);
@@ -21,7 +23,11 @@ export default class AddMarkerForm extends Component {
   };
 
   handleSubmit() {
-    this.props.addMarker(this.props.positionClicked, this.props.shrineInputValue);
+    this.props.addMarker(
+      this.state.markerType,
+      this.props.positionClicked, 
+      this.props.markerInputValue
+    );
   };
 
   render() {
@@ -38,19 +44,39 @@ export default class AddMarkerForm extends Component {
       />,
     ];
 
+    const radioButtonStyles = {
+      marginBottom: 16
+    };
+
     return (
       <div>
         <Dialog
-          title="Add New Shrine"
+          title="Add New Marker"
           actions={actions}
           modal={false}
           open={this.props.isOpen}
           onRequestClose={this.handleClose}
         >
+          <RadioButtonGroup 
+            name="markerType" 
+            defaultSelected={this.state.markerType}
+            onChange={ (e) => this.setState({ markerType: e.target.value }) }
+          >
+            <RadioButton
+              value="korokSeed"
+              label="Korok Seed"
+              style={radioButtonStyles}
+            />
+            <RadioButton
+              value="shrine"
+              label="Shrine"
+              style={radioButtonStyles}
+            />
+          </RadioButtonGroup>
           <TextField
-            floatingLabelText="Shrine Name"
-            onChange={this.props.handleShrineNameInput}
-            value={this.props.shrineInputValue}
+            floatingLabelText="Label"
+            onChange={this.props.handleMarkerNameInput}
+            value={this.props.markerInputValue}
           />
         </Dialog>
       </div>
