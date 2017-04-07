@@ -19,6 +19,7 @@ export default class App extends Component {
       zoom: 2,
       markers: [],
       addingMarker: false,
+      viewingMarker: false,
       positionClicked: [],
       markerInputValue: ''
     }
@@ -27,13 +28,14 @@ export default class App extends Component {
     this.openAddMarkerModal = this.openAddMarkerModal.bind(this);
     this.closeAddMarkerModal = this.closeAddMarkerModal.bind(this);
     this.handleMarkerNameInput = this.handleMarkerNameInput.bind(this);
+    this.openMarkerModal = this.openMarkerModal.bind(this);
   }
 
   componentDidMount() {
     const markersRef = firebase.database().ref();
     markersRef.on('value', snapshot => {
       const markersObject = snapshot.val().markers;
-      const markers = Object.keys(markersObject).map((key) => markersObject[key]);
+      const markers = Object.keys(markersObject).map((key) => Object.assign({}, markersObject[key], { id: key }));
       this.setState({
         markers: markers
       })
@@ -73,7 +75,7 @@ export default class App extends Component {
       position: position
     };
 
-    var newMarkerId = camelCase(name);
+    var newMarkerId = firebase.database().ref().child('markers').push().key;
 
     firebase.database().ref('markers/' + newMarkerId).set(newMarker);
 
@@ -82,6 +84,13 @@ export default class App extends Component {
     });
 
     this.closeAddMarkerModal();
+  }
+
+  openMarkerModal(marker) {
+    this.setState({
+      viewingMarker: true
+    });
+    console.log(marker);
   }
 
   render() {
@@ -126,6 +135,7 @@ export default class App extends Component {
               position={marker.position}
               icon={ marker.type === 'korokSeed' ? iconSeed : iconShrineActive }
               key={index}
+              onClick={ () => this.openMarkerModal(marker.id) }
             >
               <Tooltip direction='top' offset={[0, -8]}>
                 <span>{marker.name}</span>

@@ -74,7 +74,8 @@ export default class AddMarkerForm extends Component {
             />
           </RadioButtonGroup>
           <TextField
-            floatingLabelText="Label"
+            floatingLabelText="Description (optional)"
+            hintText="e.g. Rock, Rock formation, Flower"
             onChange={this.props.handleMarkerNameInput}
             value={this.props.markerInputValue}
           />
