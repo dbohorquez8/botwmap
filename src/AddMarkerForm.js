@@ -24,7 +24,7 @@ export default class AddMarkerForm extends Component {
 
   handleSubmit() {
     this.props.addMarker(
-      this.state.markerType,
+      'korokSeed', // this.state.markerType,
       this.props.positionClicked,
       this.props.markerInputValue
     );
@@ -57,7 +57,7 @@ export default class AddMarkerForm extends Component {
           open={this.props.isOpen}
           onRequestClose={this.handleClose}
         >
-          <RadioButtonGroup
+          {/*<RadioButtonGroup
             name="markerType"
             defaultSelected={this.state.markerType}
             onChange={ (e) => this.setState({ markerType: e.target.value }) }
@@ -72,7 +72,7 @@ export default class AddMarkerForm extends Component {
               label="Shrine"
               style={radioButtonStyles}
             />
-          </RadioButtonGroup>
+          </RadioButtonGroup>*/}
           <TextField
             floatingLabelText="Description (optional)"
             hintText="e.g. Rock, Rock formation, Flower"

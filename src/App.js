@@ -7,7 +7,6 @@ import './App.css';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import * as firebase from 'firebase';
-import { camelCase } from 'lodash';
 import AddMarkerForm from './AddMarkerForm';
 
 export default class App extends Component {
