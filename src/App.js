@@ -6,6 +6,8 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
+import * as firebase from 'firebase';
+import { camelCase } from 'lodash';
 import AddMarkerForm from './AddMarkerForm';
 
 export default class App extends Component {
@@ -25,6 +27,17 @@ export default class App extends Component {
     this.openAddMarkerModal = this.openAddMarkerModal.bind(this);
     this.closeAddMarkerModal = this.closeAddMarkerModal.bind(this);
     this.handleMarkerNameInput = this.handleMarkerNameInput.bind(this);
+  }
+
+  componentDidMount() {
+    const markersRef = firebase.database().ref();
+    markersRef.on('value', snapshot => {
+      const markersObject = snapshot.val().markers;
+      const markers = Object.keys(markersObject).map((key) => markersObject[key]);
+      this.setState({
+        markers: markers
+      })
+    });
   }
 
   openAddMarkerModal(event) {
@@ -60,13 +73,11 @@ export default class App extends Component {
       position: position
     };
 
-    var updatedMarkers = [
-      ...this.state.markers,
-      newMarker
-    ];
+    var newMarkerId = camelCase(name);
+
+    firebase.database().ref('markers/' + newMarkerId).set(newMarker);
 
     this.setState({
-      markers: updatedMarkers,
       markerInputValue: ''
     });
 
