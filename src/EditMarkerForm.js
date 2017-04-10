@@ -3,19 +3,18 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-// import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 
-export default class AddMarkerForm extends Component {
+export default class EditMarkerForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      open: props.isOpen,
-      markerType: 'korokSeed'
+      open: props.isOpen
     }
 
     this.handleClose = this.handleClose.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   handleClose() {
@@ -24,12 +23,19 @@ export default class AddMarkerForm extends Component {
 
   handleSubmit() {
     this.props.saveMarker(
-      'korokSeed', // this.state.markerType,
-      this.props.positionClicked,
+      this.props.marker.type,
+      this.props.marker.position,
       this.props.markerInputValue,
-      false
+      this.props.marker.id
     );
   };
+
+  handleDelete() {
+    var confirmed = confirm("Are you sure?");
+    if (confirmed) {
+      this.props.deleteMarker(this.props.marker.id);
+    }
+  }
 
   render() {
     const actions = [
@@ -38,42 +44,28 @@ export default class AddMarkerForm extends Component {
         primary={true}
         onTouchTap={this.handleClose}
       />,
+      <FlatButton
+        label="Delete Marker"
+        secondary={true}
+        onTouchTap={this.handleDelete}
+        style={ {float: "left"} }
+      />,
       <RaisedButton
-        label="Add Marker"
+        label="Update Marker"
         primary={true}
         onTouchTap={this.handleSubmit}
       />,
     ];
 
-    const radioButtonStyles = {
-      marginBottom: 16
-    };
-
     return (
       <div>
         <Dialog
-          title="Add New Marker"
+          title="Edit Marker"
           actions={actions}
           modal={false}
           open={this.props.isOpen}
           onRequestClose={this.handleClose}
         >
-          {/*<RadioButtonGroup
-            name="markerType"
-            defaultSelected={this.state.markerType}
-            onChange={ (e) => this.setState({ markerType: e.target.value }) }
-          >
-            <RadioButton
-              value="korokSeed"
-              label="Korok Seed"
-              style={radioButtonStyles}
-            />
-            <RadioButton
-              value="shrine"
-              label="Shrine"
-              style={radioButtonStyles}
-            />
-          </RadioButtonGroup>*/}
           <TextField
             floatingLabelText="Description (optional)"
             hintText="e.g. Rock, Rock formation, Flower"

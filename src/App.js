@@ -8,6 +8,7 @@ import L from 'leaflet';
 import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import * as firebase from 'firebase';
 import AddMarkerForm from './AddMarkerForm';
+import EditMarkerForm from './EditMarkerForm';
 
 export default class App extends Component {
   constructor(props) {
@@ -18,16 +19,17 @@ export default class App extends Component {
       zoom: 2,
       markers: [],
       addingMarker: false,
-      viewingMarker: false,
+      editingMarker: false,
       positionClicked: [],
-      markerInputValue: ''
+      markerInputValue: '',
+      selectedMarker: ''
     }
 
-    this.addMarker = this.addMarker.bind(this);
+    this.saveMarker = this.saveMarker.bind(this);
     this.openAddMarkerModal = this.openAddMarkerModal.bind(this);
-    this.closeAddMarkerModal = this.closeAddMarkerModal.bind(this);
+    this.openEditMarkerModal = this.openEditMarkerModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
     this.handleMarkerNameInput = this.handleMarkerNameInput.bind(this);
-    this.openMarkerModal = this.openMarkerModal.bind(this);
   }
 
   componentDidMount() {
@@ -45,6 +47,7 @@ export default class App extends Component {
     if(this.state.zoom === 6) {
       this.setState({
         addingMarker: true,
+        editingMarker: false,
         positionClicked: event.latlng,
       });
     } else {
@@ -55,9 +58,10 @@ export default class App extends Component {
     }
   }
 
-  closeAddMarkerModal() {
+  closeModal() {
     this.setState({
-      addingMarker: false
+      addingMarker: false,
+      editingMarker: false
     });
   }
 
@@ -67,14 +71,17 @@ export default class App extends Component {
     });
   }
 
-  addMarker(type, position, name) {
+  saveMarker(type, position, name, id) {
     var newMarker = {
       type: type,
       name: name,
       position: position
     };
 
-    var newMarkerId = firebase.database().ref().child('markers').push().key;
+    var newMarkerId = id;
+    if(id === false) {
+      var newMarkerId = firebase.database().ref().child('markers').push().key;  
+    }
 
     firebase.database().ref('markers/' + newMarkerId).set(newMarker);
 
@@ -82,14 +89,21 @@ export default class App extends Component {
       markerInputValue: ''
     });
 
-    this.closeAddMarkerModal();
+    this.closeModal();
   }
 
-  openMarkerModal(marker) {
+  openEditMarkerModal(marker) {
     this.setState({
-      viewingMarker: true
+      editingMarker: true,
+      addingMarker: false,
+      markerInputValue: marker.name,
+      selectedMarker: marker
     });
-    console.log(marker);
+  }
+
+  deleteMarker(markerId) {
+    firebase.database().ref('markers/' + markerId).remove();
+    this.closeModal();
   }
 
   render() {
@@ -134,9 +148,9 @@ export default class App extends Component {
               position={marker.position}
               icon={ marker.type === 'korokSeed' ? iconSeed : iconShrineActive }
               key={index}
-              onClick={ () => this.openMarkerModal(marker.id) }
+              onClick={ () => this.openEditMarkerModal(marker) }
             >
-              <Tooltip direction='top' offset={[0, -8]}>
+              <Tooltip direction='top' offset={[0, -8]} opacity={marker.name !== '' ? 1 : 0}>
                 <span>{marker.name}</span>
               </Tooltip>
             </Marker>
@@ -144,11 +158,20 @@ export default class App extends Component {
         </Map>
         <AddMarkerForm
           isOpen={this.state.addingMarker}
-          addMarker={this.addMarker}
-          closeAddMarkerModal={this.closeAddMarkerModal}
+          saveMarker={this.saveMarker}
+          closeModal={this.closeAddMarkerModal}
           positionClicked={this.state.positionClicked}
           markerInputValue={this.state.markerInputValue}
           handleMarkerNameInput={this.handleMarkerNameInput}
+        />
+        <EditMarkerForm
+          isOpen={this.state.editingMarker}
+          saveMarker={this.saveMarker}
+          closeModal={this.closeModal}
+          deleteMarker={this.deleteMarker}
+          markerInputValue={this.state.markerInputValue}
+          handleMarkerNameInput={this.handleMarkerNameInput}
+          marker={this.state.selectedMarker}
         />
       </div>
     );
