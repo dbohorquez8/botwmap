@@ -159,7 +159,7 @@ export default class App extends Component {
         <AddMarkerForm
           isOpen={this.state.addingMarker}
           saveMarker={this.saveMarker}
-          closeModal={this.closeAddMarkerModal}
+          closeModal={this.closeModal}
           positionClicked={this.state.positionClicked}
           markerInputValue={this.state.markerInputValue}
           handleMarkerNameInput={this.handleMarkerNameInput}
