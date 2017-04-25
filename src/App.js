@@ -7,6 +7,7 @@ import UserMapList from './UserMapList'
 import AppBar from 'material-ui/AppBar';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
+import AddMapForm from './AddMapForm';
 
 export default class App extends Component {
   constructor(props) {
@@ -122,7 +123,7 @@ export default class App extends Component {
       </div>
     );
     if(this.state.userMaps.length > 0){
-      content = <UserMapList maps={this.state.userMaps} />  
+      content = <UserMapList maps={this.state.userMaps} openAddMapModal={this.openAddMapModal} />  
     }
     
     return (

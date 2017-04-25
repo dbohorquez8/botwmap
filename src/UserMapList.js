@@ -11,9 +11,9 @@ export default class UserMapList extends Component {
       <div className="row">
         {this.props.maps.map((map, index) =>
           <div className="col s12 m4" key={index}>
-            <Card
+            <Card 
               zDepth={1}
-              onClick={(map) => this.props.handleMapShow(map)}
+              style={{height: "294px"}}
             >
               <CardMedia
                 overlay={<CardTitle title="My Map" subtitle="Collaborators" />}
@@ -22,11 +22,19 @@ export default class UserMapList extends Component {
               </CardMedia>
               <CardActions>
                 <FlatButton label="Edit Map" />
-                <RaisedButton label="View Map" primary={true} />
+                <RaisedButton label="View Map" primary={true} onClick={(map) => this.props.handleMapShow(map)} />
               </CardActions>
             </Card>
           </div>
         )}
+        <div className="col s12 m4">
+          <Card
+              zDepth={1}
+              style={{height: "294px", padding: "129px 0"}}
+            >
+            <RaisedButton onClick={this.openAddMapModal} label="Create a Map" primary={true} />
+          </Card>
+        </div>
       </div>
     );
   }
