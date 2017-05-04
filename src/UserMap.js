@@ -31,13 +31,16 @@ export default class UserMap extends Component {
   }
 
   componentDidMount() {
-    const markersRef = firebase.database().ref();
+    const markersRef = firebase.database().ref('/markers/' + this.props.map.id);
     markersRef.on('value', snapshot => {
-      const markersObject = snapshot.val().markers;
-      const markers = Object.keys(markersObject).map((key) => Object.assign({}, markersObject[key], { id: key }));
-      this.setState({
-        markers: markers
-      })
+      const markersObject = snapshot.val();
+      if(markersObject){
+        console.warn(markersObject)
+        const markers = Object.keys(markersObject).map((key) => Object.assign({}, markersObject[key], { id: key }));
+        this.setState({
+          markers: markers
+        })
+      }
     });
   }
 
@@ -78,10 +81,10 @@ export default class UserMap extends Component {
 
     var newMarkerId = id;
     if(id === false) {
-      var newMarkerId = firebase.database().ref().child('markers').push().key;
+      var newMarkerId = firebase.database().ref('/markers/' + this.props.map.id).push().key;
     }
 
-    firebase.database().ref('markers/' + newMarkerId).set(newMarker);
+    firebase.database().ref('markers/' + this.props.map.id + '/' + newMarkerId).set(newMarker);
 
     this.setState({
       markerInputValue: ''
@@ -100,7 +103,7 @@ export default class UserMap extends Component {
   }
 
   deleteMarker(markerId) {
-    firebase.database().ref('markers/' + markerId).remove();
+    firebase.database().ref('markers/' + this.props.map.id + '/' + markerId).remove();
     this.closeModal();
   }
 

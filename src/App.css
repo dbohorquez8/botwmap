@@ -10,3 +10,10 @@
 .leaflet-container {
   background: #000;
 }
+
+.btn--back {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 1000;
+}

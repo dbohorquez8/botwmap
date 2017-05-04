@@ -3,11 +3,13 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 import shrineActive from './images/icons/shrine-active.svg';
 import * as firebase from 'firebase';
-import UserMapList from './UserMapList'
 import AppBar from 'material-ui/AppBar';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import AddMapForm from './AddMapForm';
+import UserMapList from './UserMapList'
+import UserMap from './UserMap'
+import {getCurrentUser, getUserMaps, deleteMap, saveMap} from './api/api';
 
 export default class App extends Component {
   constructor(props) {
@@ -18,7 +20,8 @@ export default class App extends Component {
       currentUser: undefined,
       addingMap: false,
       editingMap: false,
-      mapInputValue: false
+      mapInputValue: '',
+      selectedMap: null
     }
 
     this.saveMap = this.saveMap.bind(this);
@@ -26,26 +29,35 @@ export default class App extends Component {
     this.openEditMapModal = this.openEditMapModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.handleMapNameInput = this.handleMapNameInput.bind(this);
+    this.handleMapShow = this.handleMapShow.bind(this);
+    this.handleMapClose = this.handleMapClose.bind(this);
   }
 
   componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      this.setState({currentUser: user})
-
-      const userMapsRef = firebase.database().ref('users/' + this.state.currentUser.uid + '/maps');
-      userMapsRef.on('value', snapshot => {
-        const userMapsObject = snapshot.val();
-        if(userMapsObject){
-          const userMaps = Object.keys(userMapsObject).map((key) => Object.assign({}, userMapsObject[key], { id: key }));
-          this.setState({
-            userMaps: userMaps
-          }) ;
-        }
+    getCurrentUser().then((user) => {
+      getUserMaps(user.uid).then((userMapsObject) => {
+        const userMaps = Object.keys(userMapsObject).map((key) => Object.assign({}, userMapsObject[key], { id: key }));
+        this.setState({
+          currentUser: user,
+          userMaps: userMaps
+        });
       });
     });
   }
 
-  openAddMapModal(event) {
+  handleMapShow(selectedMap) {
+    this.setState({
+      selectedMap: selectedMap
+    });
+  }
+
+  handleMapClose() {
+    this.setState({
+      selectedMap: null
+    });
+  }
+
+  openAddMapModal() {
     this.setState({
       addingMap: true,
       editingMap: false
@@ -65,40 +77,19 @@ export default class App extends Component {
     });
   }
 
-  saveMarker(type, position, name, id) {
-    var newMarker = {
-      type: type,
-      name: name,
-      position: position
-    };
-
-    var newMarkerId = id;
-    if(id === false) {
-      var newMarkerId = firebase.database().ref().child('markers').push().key;
+  saveMap(title, id) {
+    var newMap = {
+      title: title,
+      author: this.state.currentUser.uid
     }
 
-    firebase.database().ref('markers/' + newMarkerId).set(newMarker);
+    saveMap(newMap, id);
 
     this.setState({
-      markerInputValue: ''
+      mapInputValue: ''
     });
 
     this.closeModal();
-  }
-
-  saveMap(title, id) {
-    var newMap = {
-      title: title
-    }
-
-    var newMapId = id;
-
-    if(id === false){
-      newMapId = firebase.database().ref().child('maps').push().key;  
-    }
-    
-    firebase.database().ref('maps/' + newMapId).set(newMap);
-    firebase.database().ref('users/' + this.state.currentUser.uid + '/maps/' + newMapId).set(newMap);
   }
 
   openEditMapModal(map) {
@@ -111,21 +102,36 @@ export default class App extends Component {
   }
 
   deleteMap(mapId) {
-    firebase.database().ref('maps/' + mapId).remove();
+    deleteMap(mapId);
     this.closeModal();
   }
 
   render() {
-    var content = (
-      <div>
-        <p>You don't have any maps yet.</p>
-        <RaisedButton onClick={this.openAddMapModal} label="Create a Map" primary={true} />
-      </div>
-    );
-    if(this.state.userMaps.length > 0){
-      content = <UserMapList maps={this.state.userMaps} openAddMapModal={this.openAddMapModal} />  
+    var content = ''
+
+    if(!this.state.selectedMap) {
+      content = (
+        <div>
+          <p>You don't have any maps yet.</p>
+          <RaisedButton onClick={this.openAddMapModal} label="Create a Map" primary={true} />
+        </div>
+      );
     }
-    
+
+    if(this.state.userMaps && !this.state.selectedMap){
+      content = <UserMapList maps={this.state.userMaps} openAddMapModal={this.openAddMapModal} handleMapShow={this.handleMapShow} />  
+    }
+
+    var renderedMap = '';
+    if(this.state.selectedMap) {
+      renderedMap = (
+        <div>
+          <UserMap map={this.state.selectedMap} />
+          <RaisedButton label="&laquo; Back" primary={true} onClick={this.handleMapClose} className="btn--back" />
+        </div>
+      );
+    }
+
     return (
       <div>
         <AppBar
@@ -142,6 +148,7 @@ export default class App extends Component {
           mapInputValue={this.state.mapInputValue}
           handleMapNameInput={this.handleMapNameInput}
         />
+        { renderedMap }
       </div>
     )
   }
