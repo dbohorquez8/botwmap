@@ -7,6 +7,7 @@ import AppBar from 'material-ui/AppBar';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import AddMapForm from './AddMapForm';
+import EditMapForm from './EditMapForm';
 import UserMapList from './UserMapList'
 import UserMap from './UserMap'
 import {getCurrentUser, getUserMaps, deleteMap, saveMap} from './api/api';
@@ -21,7 +22,8 @@ export default class App extends Component {
       addingMap: false,
       editingMap: false,
       mapInputValue: '',
-      selectedMap: null
+      displayedMap: null,
+      selectedMap: null,
     }
 
     this.saveMap = this.saveMap.bind(this);
@@ -45,15 +47,15 @@ export default class App extends Component {
     });
   }
 
-  handleMapShow(selectedMap) {
+  handleMapShow(displayedMap) {
     this.setState({
-      selectedMap: selectedMap
+      displayedMap: displayedMap
     });
   }
 
   handleMapClose() {
     this.setState({
-      selectedMap: null
+      displayedMap: null
     });
   }
 
@@ -101,15 +103,15 @@ export default class App extends Component {
     });
   }
 
-  deleteMap(mapId) {
-    deleteMap(mapId);
+  deleteMap(map) {
+    deleteMap(map);
     this.closeModal();
   }
 
   render() {
     var content = ''
 
-    if(!this.state.selectedMap) {
+    if(!this.state.displayedMap) {
       content = (
         <div>
           <p>You don't have any maps yet.</p>
@@ -118,15 +120,20 @@ export default class App extends Component {
       );
     }
 
-    if(this.state.userMaps && !this.state.selectedMap){
-      content = <UserMapList maps={this.state.userMaps} openAddMapModal={this.openAddMapModal} handleMapShow={this.handleMapShow} />  
+    if(this.state.userMaps && !this.state.displayedMap){
+      content = <UserMapList
+                  maps={this.state.userMaps}
+                  openAddMapModal={this.openAddMapModal}
+                  handleMapShow={this.handleMapShow}
+                  handleMapEdit={this.openEditMapModal}
+                />
     }
 
     var renderedMap = '';
-    if(this.state.selectedMap) {
+    if(this.state.displayedMap) {
       renderedMap = (
         <div>
-          <UserMap map={this.state.selectedMap} />
+          <UserMap map={this.state.displayedMap} />
           <RaisedButton label="&laquo; Back" primary={true} onClick={this.handleMapClose} className="btn--back" />
         </div>
       );
@@ -147,6 +154,15 @@ export default class App extends Component {
           closeModal={this.closeModal}
           mapInputValue={this.state.mapInputValue}
           handleMapNameInput={this.handleMapNameInput}
+        />
+        <EditMapForm
+          isOpen={this.state.editingMap}
+          saveMap={this.saveMap}
+          deleteMap={this.deleteMap}
+          closeModal={this.closeModal}
+          mapInputValue={this.state.mapInputValue}
+          handleMapNameInput={this.handleMapNameInput}
+          map={this.state.selectedMap}
         />
         { renderedMap }
       </div>

@@ -13,8 +13,9 @@ export function getUserMaps(uid) {
   });
 }
 
-export function deleteMap(mapId) {
-  firebase.database().ref('maps/' + mapId).remove();
+export function deleteMap(map) {
+  firebase.database().ref('maps/' + map.id).remove();
+  firebase.database().ref('users/' + map.author + '/maps/' + map.id).remove();
 }
 
 export function saveMap(newMap, id) {

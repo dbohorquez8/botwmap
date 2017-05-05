@@ -21,7 +21,7 @@ export default class UserMapList extends Component {
                 <img src={mapThumbnail} alt="" />
               </CardMedia>
               <CardActions>
-                <FlatButton label="Edit Map" />
+                <FlatButton label="Edit Map" onClick={() => this.props.handleMapEdit(map)} />
                 <RaisedButton label="View Map" primary={true} onClick={() => this.props.handleMapShow(map)} />
               </CardActions>
             </Card>
