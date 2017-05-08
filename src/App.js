@@ -37,12 +37,12 @@ export default class App extends Component {
 
   componentDidMount() {
     getCurrentUser().then((user) => {
-      getUserMaps(user.uid).then((userMapsObject) => {
+      getUserMaps(user.uid, (userMapsObject) => {
         const userMaps = Object.keys(userMapsObject).map((key) => Object.assign({}, userMapsObject[key], { id: key }));
-        this.setState({
-          currentUser: user,
-          userMaps: userMaps
-        });
+          this.setState({
+            currentUser: user,
+            userMaps: userMaps
+          });
       });
     });
   }

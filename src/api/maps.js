@@ -1,15 +1,13 @@
 import firebase from 'firebase';
 
-export function getUserMaps(uid) {
+export function getUserMaps(uid, callback) {
   const userMapsRef = firebase.database().ref('users/' + uid + '/maps');
-  return new Promise(function (resolve, reject) {
-    userMapsRef.on('value', snapshot => {
-      if(snapshot) {
-        resolve(snapshot.val());
-      }else{
-        reject(Error('Something went wrong'));
-      }
-    });
+  userMapsRef.on('value', snapshot => {
+    if(snapshot) {
+      callback(snapshot.val());
+    }else{
+      // reject(Error('Something went wrong'));
+    }
   });
 }
 
