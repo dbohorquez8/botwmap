@@ -35,7 +35,6 @@ export default class UserMap extends Component {
     markersRef.on('value', snapshot => {
       const markersObject = snapshot.val();
       if(markersObject){
-        console.warn(markersObject)
         const markers = Object.keys(markersObject).map((key) => Object.assign({}, markersObject[key], { id: key }));
         this.setState({
           markers: markers
