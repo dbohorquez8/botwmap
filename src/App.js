@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
-import shrineActive from './images/icons/shrine-active.svg';
-import * as firebase from 'firebase';
 import AppBar from 'material-ui/AppBar';
-import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
-import AddMapForm from './AddMapForm';
-import EditMapForm from './EditMapForm';
-import UserMapList from './UserMapList'
-import UserMap from './UserMap'
-import {getCurrentUser, getUserMaps, deleteMap, saveMap} from './api/api';
+import {Route, Switch} from 'react-router-dom';
+import Dashboard from './Dashboard';
+import UserMap from './UserMap';
+import {getCurrentUser, getUserMaps} from './api/api';
 
 export default class App extends Component {
   constructor(props) {
@@ -18,21 +14,8 @@ export default class App extends Component {
 
     this.state = {
       userMaps: [],
-      currentUser: undefined,
-      addingMap: false,
-      editingMap: false,
-      mapInputValue: '',
-      displayedMap: null,
-      selectedMap: null,
+      currentUser: undefined
     }
-
-    this.saveMap = this.saveMap.bind(this);
-    this.openAddMapModal = this.openAddMapModal.bind(this);
-    this.openEditMapModal = this.openEditMapModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-    this.handleMapNameInput = this.handleMapNameInput.bind(this);
-    this.handleMapShow = this.handleMapShow.bind(this);
-    this.handleMapClose = this.handleMapClose.bind(this);
   }
 
   componentDidMount() {
@@ -50,125 +33,28 @@ export default class App extends Component {
     });
   }
 
-  handleMapShow(displayedMap) {
-    this.setState({
-      displayedMap: displayedMap
-    });
-  }
-
-  handleMapClose() {
-    this.setState({
-      displayedMap: null
-    });
-  }
-
-  openAddMapModal() {
-    this.setState({
-      addingMap: true,
-      editingMap: false
-    });
-  }
-
-  closeModal() {
-    this.setState({
-      addingMap: false,
-      editingMap: false
-    });
-  }
-
-  handleMapNameInput(event) {
-    this.setState({
-      mapInputValue: event.target.value
-    });
-  }
-
-  saveMap(title, id) {
-    var newMap = {
-      title: title,
-      author: this.state.currentUser.uid
-    }
-
-    saveMap(newMap, id);
-
-    this.setState({
-      mapInputValue: ''
-    });
-
-    this.closeModal();
-  }
-
-  openEditMapModal(map) {
-    this.setState({
-      editingMap: true,
-      addingMap: false,
-      mapInputValue: map.title,
-      selectedMap: map
-    });
-  }
-
-  deleteMap(map) {
-    deleteMap(map);
-    this.closeModal();
-  }
-
   render() {
-    var content = ''
-
-    if(!this.state.displayedMap) {
-      content = (
-        <div>
-          <p>You don't have any maps yet.</p>
-          <RaisedButton onClick={this.openAddMapModal} label="Create a Map" primary={true} />
-        </div>
-      );
-    }
-
-    if(this.state.userMaps && !this.state.displayedMap){
-      content = <UserMapList
-                  maps={this.state.userMaps}
-                  openAddMapModal={this.openAddMapModal}
-                  handleMapShow={this.handleMapShow}
-                  handleMapEdit={this.openEditMapModal}
-                />
-    }
-
-    var renderedMap = '';
-    if(this.state.displayedMap) {
-      renderedMap = (
-        <div>
-          <UserMap map={this.state.displayedMap} />
-          <RaisedButton label="&laquo; Back" primary={true} onClick={this.handleMapClose} className="btn--back" />
-        </div>
-      );
-    }
-
+    const header = <AppBar
+      style={{marginBottom: '40px'}}
+      title={<span>Hyrule Map</span>}
+      iconElementRight={<FlatButton label="Sign Out" />}
+      showMenuIconButton={false}
+    />
     return (
       <div>
-        <AppBar
-          style={{marginBottom: '40px'}}
-          title={<span>Hyrule Map</span>}
-          iconElementRight={<FlatButton label="Sign Out" />}
-          showMenuIconButton={false}
-        />
-        <div className="container center-align">{content}</div>
-        <AddMapForm
-          isOpen={this.state.addingMap}
-          saveMap={this.saveMap}
-          closeModal={this.closeModal}
-          mapInputValue={this.state.mapInputValue}
-          handleMapNameInput={this.handleMapNameInput}
-        />
-        <EditMapForm
-          isOpen={this.state.editingMap}
-          saveMap={this.saveMap}
-          deleteMap={this.deleteMap}
-          closeModal={this.closeModal}
-          mapInputValue={this.state.mapInputValue}
-          handleMapNameInput={this.handleMapNameInput}
-          map={this.state.selectedMap}
-        />
-        { renderedMap }
+        <Switch>
+          <Route path="/maps/:id" render={(props) => <div>
+              {header}
+              <UserMap props={props} map={props.match.params.id} />
+            </div>
+          } />
+          <Route path="/" exactly render={(props) => <div>
+              {header}
+              <Dashboard props={props} userMaps={this.state.userMaps} />
+            </div>
+          } />
+        </Switch>
       </div>
-    )
+    );
   }
 }

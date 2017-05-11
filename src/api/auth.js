@@ -12,11 +12,7 @@ export function auth(){
         }
         var user = result.user;
       }).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        var email = error.email;
-        var credential = error.credential;
-        alert("An error occurred")
+        alert("An error occurred:" + error.message)
       });
     }
   });

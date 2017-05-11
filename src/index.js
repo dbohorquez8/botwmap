@@ -6,7 +6,9 @@ import 'materialize-css/dist/css/materialize.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import * as firebase from 'firebase';
-import {config, auth} from './api/api'
+import {BrowserRouter as Router} from 'react-router-dom';
+import {config, auth} from './api/api';
+
 
 injectTapEventPlugin();
 
@@ -21,6 +23,8 @@ const Main = () => (
 );
 
 ReactDOM.render(
-  <Main />,
+  <Router>
+    <Main />
+  </Router>,
   document.getElementById('root')
 );

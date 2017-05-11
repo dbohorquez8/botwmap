@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import mapThumbnail from './images/map-thumbnail.png';
 import {Card, CardActions, CardMedia, CardTitle} from 'material-ui/Card';
-import UserMap from './UserMap';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
+import {Link} from 'react-router-dom';
 
 export default class UserMapList extends Component {
   render() {
@@ -16,13 +16,15 @@ export default class UserMapList extends Component {
               style={{marginBottom: "25px"}}
             >
               <CardMedia
-                overlay={<CardTitle title={map.title} subtitle="Collaborators" />}
+                overlay={<CardTitle title={map.title} subtitle="" />}
               >
                 <img src={mapThumbnail} alt="" />
               </CardMedia>
               <CardActions>
                 <FlatButton label="Edit Map" onClick={() => this.props.handleMapEdit(map)} />
-                <RaisedButton label="View Map" primary={true} onClick={() => this.props.handleMapShow(map)} />
+                <Link to={"/maps/" + map.id}>
+                  <RaisedButton label="View Map" primary={true} onClick={() => this.props.handleMapShow(map)} />
+                </Link>
               </CardActions>
             </Card>
           </div>

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import korokSeed from './images/icons/korok-seed.png';
 import shrineActive from './images/icons/shrine-active.svg';
 import boss from './images/icons/boss.svg';
+import RaisedButton from 'material-ui/RaisedButton';
+import {Link} from 'react-router-dom';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import * as firebase from 'firebase';
@@ -31,7 +33,7 @@ export default class UserMap extends Component {
   }
 
   componentDidMount() {
-    const markersRef = firebase.database().ref('/markers/' + this.props.map.id);
+    const markersRef = firebase.database().ref('/markers/' + this.props.map);
     markersRef.on('value', snapshot => {
       const markersObject = snapshot.val();
       if(markersObject){
@@ -80,10 +82,10 @@ export default class UserMap extends Component {
 
     var newMarkerId = id;
     if(id === false) {
-      var newMarkerId = firebase.database().ref('/markers/' + this.props.map.id).push().key;
+      newMarkerId = firebase.database().ref('/markers/' + this.props.map).push().key;
     }
 
-    firebase.database().ref('markers/' + this.props.map.id + '/' + newMarkerId).set(newMarker);
+    firebase.database().ref('markers/' + this.props.map + '/' + newMarkerId).set(newMarker);
 
     this.setState({
       markerInputValue: ''
@@ -102,7 +104,7 @@ export default class UserMap extends Component {
   }
 
   deleteMarker(markerId) {
-    firebase.database().ref('markers/' + this.props.map.id + '/' + markerId).remove();
+    firebase.database().ref('markers/' + this.props.map + '/' + markerId).remove();
     this.closeModal();
   }
 
@@ -156,6 +158,9 @@ export default class UserMap extends Component {
             </Marker>
           )}
         </Map>
+        <Link to="/">
+          <RaisedButton label="&laquo; Back" primary={true} className="btn--back" />
+        </Link>
         <AddMarkerForm
           isOpen={this.state.addingMarker}
           saveMarker={this.saveMarker}
