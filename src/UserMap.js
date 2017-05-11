@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import korokSeed from './images/icons/korok-seed.png';
 import shrineActive from './images/icons/shrine-active.svg';
-import shrineInactive from './images/icons/shrine-inactive.svg';
+import boss from './images/icons/boss.svg';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import * as firebase from 'firebase';
@@ -108,23 +108,23 @@ export default class UserMap extends Component {
   }
 
   render() {
-    const iconSeed = L.icon({
-      iconUrl: korokSeed,
-      iconSize: [12, 12],
-      iconAnchor: [6, 6]
-    });
-
-    const iconShrineActive = L.icon({
-      iconUrl: shrineActive,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
-
-    const iconShrineInactive = L.icon({
-      iconUrl: shrineInactive,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
+    const icons = {
+      korokSeed: L.icon({
+        iconUrl: korokSeed,
+        iconSize: [12, 12],
+        iconAnchor: [6, 6]
+      }),
+      shrine: L.icon({
+        iconUrl: shrineActive,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      }),
+      boss: L.icon({
+        iconUrl: boss,
+        iconSize: [12, 12],
+        iconAnchor: [8, 8]
+      })
+    };
 
     return (
       <div>
@@ -147,7 +147,7 @@ export default class UserMap extends Component {
           {this.state.markers.map((marker, index) =>
             <Marker
               position={marker.position}
-              icon={ marker.type === 'korokSeed' ? iconSeed : iconShrineActive }
+              icon={ icons[marker.type] }
               key={index}
               onClick={ () => this.openEditMarkerModal(marker) }
             >
