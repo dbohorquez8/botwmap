@@ -1,179 +1,171 @@
 import React, { Component } from 'react';
-import korokSeed from './images/icons/korok-seed.png';
-import shrineActive from './images/icons/shrine-active.svg';
-import shrineInactive from './images/icons/shrine-inactive.svg';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
-import L from 'leaflet';
-import { Map, TileLayer, Marker, Tooltip } from 'react-leaflet';
+import shrineActive from './images/icons/shrine-active.svg';
 import * as firebase from 'firebase';
-import AddMarkerForm from './AddMarkerForm';
-import EditMarkerForm from './EditMarkerForm';
+import AppBar from 'material-ui/AppBar';
+import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import AddMapForm from './AddMapForm';
+import EditMapForm from './EditMapForm';
+import UserMapList from './UserMapList'
+import UserMap from './UserMap'
+import {getCurrentUser, getUserMaps, deleteMap, saveMap} from './api/api';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      center: [-128, 128],
-      zoom: 2,
-      markers: [],
-      addingMarker: false,
-      editingMarker: false,
-      positionClicked: [],
-      markerInputValue: '',
-      selectedMarker: ''
+      userMaps: [],
+      currentUser: undefined,
+      addingMap: false,
+      editingMap: false,
+      mapInputValue: '',
+      displayedMap: null,
+      selectedMap: null,
     }
 
-    this.saveMarker = this.saveMarker.bind(this);
-    this.openAddMarkerModal = this.openAddMarkerModal.bind(this);
-    this.openEditMarkerModal = this.openEditMarkerModal.bind(this);
+    this.saveMap = this.saveMap.bind(this);
+    this.openAddMapModal = this.openAddMapModal.bind(this);
+    this.openEditMapModal = this.openEditMapModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.handleMarkerNameInput = this.handleMarkerNameInput.bind(this);
+    this.handleMapNameInput = this.handleMapNameInput.bind(this);
+    this.handleMapShow = this.handleMapShow.bind(this);
+    this.handleMapClose = this.handleMapClose.bind(this);
   }
 
   componentDidMount() {
-    const markersRef = firebase.database().ref();
-    markersRef.on('value', snapshot => {
-      const markersObject = snapshot.val().markers;
-      const markers = Object.keys(markersObject).map((key) => Object.assign({}, markersObject[key], { id: key }));
-      this.setState({
-        markers: markers
-      })
+    getCurrentUser().then((user) => {
+      getUserMaps(user.uid, (userMapsObject) => {
+        const userMaps = Object.keys(userMapsObject).map((key) => Object.assign({}, userMapsObject[key], { id: key }));
+          this.setState({
+            currentUser: user,
+            userMaps: userMaps
+          });
+      });
     });
   }
 
-  openAddMarkerModal(event) {
-    if(this.state.zoom === 6) {
-      this.setState({
-        addingMarker: true,
-        editingMarker: false,
-        positionClicked: event.latlng,
-      });
-    } else {
-      this.setState({
-        center: event.latlng,
-        zoom: 6
-      });
-    }
+  handleMapShow(displayedMap) {
+    this.setState({
+      displayedMap: displayedMap
+    });
+  }
+
+  handleMapClose() {
+    this.setState({
+      displayedMap: null
+    });
+  }
+
+  openAddMapModal() {
+    this.setState({
+      addingMap: true,
+      editingMap: false
+    });
   }
 
   closeModal() {
     this.setState({
-      addingMarker: false,
-      editingMarker: false
+      addingMap: false,
+      editingMap: false
     });
   }
 
-  handleMarkerNameInput(event) {
+  handleMapNameInput(event) {
     this.setState({
-      markerInputValue: event.target.value
+      mapInputValue: event.target.value
     });
   }
 
-  saveMarker(type, position, name, id) {
-    var newMarker = {
-      type: type,
-      name: name,
-      position: position
-    };
-
-    var newMarkerId = id;
-    if(id === false) {
-      var newMarkerId = firebase.database().ref().child('markers').push().key;  
+  saveMap(title, id) {
+    var newMap = {
+      title: title,
+      author: this.state.currentUser.uid
     }
 
-    firebase.database().ref('markers/' + newMarkerId).set(newMarker);
+    saveMap(newMap, id);
 
     this.setState({
-      markerInputValue: ''
+      mapInputValue: ''
     });
 
     this.closeModal();
   }
 
-  openEditMarkerModal(marker) {
+  openEditMapModal(map) {
     this.setState({
-      editingMarker: true,
-      addingMarker: false,
-      markerInputValue: marker.name,
-      selectedMarker: marker
+      editingMap: true,
+      addingMap: false,
+      mapInputValue: map.title,
+      selectedMap: map
     });
   }
 
-  deleteMarker(markerId) {
-    firebase.database().ref('markers/' + markerId).remove();
+  deleteMap(map) {
+    deleteMap(map);
     this.closeModal();
   }
 
   render() {
-    const iconSeed = L.icon({
-      iconUrl: korokSeed,
-      iconSize: [12, 12],
-      iconAnchor: [6, 6]
-    });
+    var content = ''
 
-    const iconShrineActive = L.icon({
-      iconUrl: shrineActive,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
+    if(!this.state.displayedMap) {
+      content = (
+        <div>
+          <p>You don't have any maps yet.</p>
+          <RaisedButton onClick={this.openAddMapModal} label="Create a Map" primary={true} />
+        </div>
+      );
+    }
 
-    const iconShrineInactive = L.icon({
-      iconUrl: shrineInactive,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
+    if(this.state.userMaps && !this.state.displayedMap){
+      content = <UserMapList
+                  maps={this.state.userMaps}
+                  openAddMapModal={this.openAddMapModal}
+                  handleMapShow={this.handleMapShow}
+                  handleMapEdit={this.openEditMapModal}
+                />
+    }
+
+    var renderedMap = '';
+    if(this.state.displayedMap) {
+      renderedMap = (
+        <div>
+          <UserMap map={this.state.displayedMap} />
+          <RaisedButton label="&laquo; Back" primary={true} onClick={this.handleMapClose} className="btn--back" />
+        </div>
+      );
+    }
 
     return (
       <div>
-        <Map
-          className="map-container"
-          crs={L.CRS.Simple}
-          minZoom={2}
-          maxZoom={6}
-          center={this.state.center}
-          zoom={this.state.zoom}
-          bounds={new L.LatLngBounds([0,256], [-256, 0])}
-          onClick={this.openAddMarkerModal}
-          onZoom={ (e) => {this.setState({zoom: e.target._zoom })} }
-        >
-          <TileLayer
-            url='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/{z}_{x}_{y}.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
-            errorTileUrl='https://firebasestorage.googleapis.com/v0/b/btowmap.appspot.com/o/blank.png?alt=media&token=1003cab9-76b2-4d8c-99fc-6164b0e6ced0'
-            attribution='Map data &copy; Nintendo'
-          />
-          {this.state.markers.map((marker, index) =>
-            <Marker
-              position={marker.position}
-              icon={ marker.type === 'korokSeed' ? iconSeed : iconShrineActive }
-              key={index}
-              onClick={ () => this.openEditMarkerModal(marker) }
-            >
-              <Tooltip direction='top' offset={[0, -8]} opacity={marker.name !== '' ? 1 : 0}>
-                <span>{marker.name}</span>
-              </Tooltip>
-            </Marker>
-          )}
-        </Map>
-        <AddMarkerForm
-          isOpen={this.state.addingMarker}
-          saveMarker={this.saveMarker}
-          closeModal={this.closeModal}
-          positionClicked={this.state.positionClicked}
-          markerInputValue={this.state.markerInputValue}
-          handleMarkerNameInput={this.handleMarkerNameInput}
+        <AppBar
+          style={{marginBottom: '40px'}}
+          title={<span>Hyrule Map</span>}
+          iconElementRight={<FlatButton label="Sign Out" />}
+          showMenuIconButton={false}
         />
-        <EditMarkerForm
-          isOpen={this.state.editingMarker}
-          saveMarker={this.saveMarker}
+        <div className="container center-align">{content}</div>
+        <AddMapForm
+          isOpen={this.state.addingMap}
+          saveMap={this.saveMap}
           closeModal={this.closeModal}
-          deleteMarker={this.deleteMarker}
-          markerInputValue={this.state.markerInputValue}
-          handleMarkerNameInput={this.handleMarkerNameInput}
-          marker={this.state.selectedMarker}
+          mapInputValue={this.state.mapInputValue}
+          handleMapNameInput={this.handleMapNameInput}
         />
+        <EditMapForm
+          isOpen={this.state.editingMap}
+          saveMap={this.saveMap}
+          deleteMap={this.deleteMap}
+          closeModal={this.closeModal}
+          mapInputValue={this.state.mapInputValue}
+          handleMapNameInput={this.handleMapNameInput}
+          map={this.state.selectedMap}
+        />
+        { renderedMap }
       </div>
-    );
+    )
   }
 }
