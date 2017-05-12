@@ -4,7 +4,8 @@ export {
 
 export {
   auth,
-  getCurrentUser
+  getCurrentUser,
+  signOut
 } from './auth';
 
 export {

@@ -29,3 +29,7 @@ export function getCurrentUser() {
     });
   });
 }
+
+export function signOut() {
+  firebase.auth().signOut();
+}

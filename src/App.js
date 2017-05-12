@@ -6,7 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {Route, Switch} from 'react-router-dom';
 import Dashboard from './Dashboard';
 import UserMap from './UserMap';
-import {getCurrentUser, getUserMaps} from './api/api';
+import {getCurrentUser, getUserMaps, signOut} from './api/api';
 
 export default class App extends Component {
   constructor(props) {
@@ -16,6 +16,8 @@ export default class App extends Component {
       userMaps: [],
       currentUser: undefined
     }
+
+    this.handleSignOut = this.handleSignOut.bind(this);
   }
 
   componentDidMount() {
@@ -33,11 +35,15 @@ export default class App extends Component {
     });
   }
 
+  handleSignOut() {
+    signOut();
+  }
+
   render() {
     const header = <AppBar
       style={{marginBottom: '40px'}}
       title={<span>Hyrule Map</span>}
-      iconElementRight={<FlatButton label="Sign Out" />}
+      iconElementRight={<FlatButton label="Sign Out" onClick={this.handleSignOut} />}
       showMenuIconButton={false}
     />
     return (
