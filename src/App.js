@@ -56,7 +56,7 @@ export default class App extends Component {
           } />
           <Route path="/" exactly render={(props) => <div>
               {header}
-              <Dashboard props={props} userMaps={this.state.userMaps} />
+              <Dashboard props={props} userMaps={this.state.userMaps} currentUser={this.state.currentUser} />
             </div>
           } />
         </Switch>

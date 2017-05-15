@@ -13,7 +13,7 @@ export default class Dashboard extends Component {
       addingMap: false,
       editingMap: false,
       mapInputValue: '',
-      selectedMap: null,
+      selectedMap: null
     }
 
     this.saveMap = this.saveMap.bind(this);
@@ -59,7 +59,7 @@ export default class Dashboard extends Component {
   saveMap(title, id) {
     var newMap = {
       title: title,
-      author: this.state.currentUser.uid
+      author: this.props.currentUser.uid
     }
 
     saveMap(newMap, id);
