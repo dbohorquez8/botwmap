@@ -54,7 +54,7 @@ export default class App extends Component {
               <UserMap props={props} map={props.match.params.id} />
             </div>
           } />
-          <Route path="/" exactly render={(props) => <div>
+          <Route path="/" exact render={(props) => <div>
               {header}
               <Dashboard props={props} userMaps={this.state.userMaps} currentUser={this.state.currentUser} />
             </div>

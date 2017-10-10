@@ -55,6 +55,8 @@ export default class EditMapForm extends Component {
       />,
     ];
 
+    const mapId = this.props.map ? this.props.map.id : '';
+
     return (
       <div>
         <Dialog
@@ -69,6 +71,11 @@ export default class EditMapForm extends Component {
             hintText="e.g. My solo map"
             onChange={this.props.handleMapNameInput}
             value={this.props.mapInputValue}
+          />
+          <p>Share this URL with your friends so they can add markers to your map:</p>
+          <TextField
+            value={`https://botwmap.surge.sh/maps/${mapId}`}
+            fullWidth={true}
           />
         </Dialog>
       </div>
